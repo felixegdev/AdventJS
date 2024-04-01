@@ -5,7 +5,7 @@ function cyberReindeer(road, time) {
   let barrierPosition1 = road.indexOf('|');
   let barrierPosition2 = road.indexOf('|',barrierPosition1 + 1);
 
-  for (let i = 1; i <= road.length; i++) {
+  for (let i = 1; i <= time; i++) {
     // Avanzar el trineo una posición a la derecha en cada unidad de tiempo
     const currentPosition = ((i * time) / road.length);
 
@@ -22,6 +22,9 @@ function cyberReindeer(road, time) {
       roadArray[currentPosition] = 'S';
     }else{
       console.log(currentPosition,barrierOpened);
+      if(roadArray[currentPosition] === '|'){
+        console.log("barrera");
+      }
     }
 
     // Agregar el estado actualizado de la carretera al resultado

@@ -1,38 +1,68 @@
-function decode(message) {
+function drawGift(size, symbol) {
+  // 1. Borde superior
+  // 2. Plano superior
+  // 3. Borde intermedio
+  // 4. Plano inferior
+  // 5. Borde inferior
+  // (Aplicar corrección para size = 1)
 
-  //we create an array that will store the result as we are creating it.
-  const stack = [];
+  if (size === 1) return '#\n'
 
-  //we create an array that will be the expected result.
-  let result = '';
+  let gift = ''
+  const maxLength = size * 2 - 1
+  const upperBorder = ' '.repeat(maxLength - size) + '#'.repeat(size)
+  let upperPlane = ''
+  const middleBorder = '#'.repeat(size) + symbol.repeat(size - 2) + '#'
+  let lowerPlane = ''
+  const lowerBorder = '#'.repeat(size)
 
-  //we iterate the message to go char by char.
-  for (const char of message) {
-    //if the char is a '(' that means that all the chars that we have stored in resultwe need to move them into the stack array.
-    if (char === '(') {
-      //we push all we have stored in stack result into stack.
-      stack.push(result);
-      //here we need to restart the result array to start storing the new part of the encrypted message.
-      result = '';
-    } else if (char === ')') {
-      //with the char ')' that means that the encrypted part has ended, and all the chars we have in the 
-      //result array needs to be reversed. 
-      result = stack.pop() + result.split('').reverse().join('');
-    } else {
-      //if we have no parenthesis, we store the chars into the result waiting either way to finish the message, or for the next parenthesis.
-      result += char;
-    }
+  for(let i = 1, j = size - 2; i <= size - 2; i++, j--) {
+    const repBlanks = ' '.repeat(maxLength - size - i)
+    const edge1 = '#'
+    const leftRepSymbol = symbol.repeat(size - 2)
+    const edge2 = '#'
+    const upperRightRepSymbol = symbol.repeat(i - 1)
+    const lowerRightRepSymbol = symbol.repeat(j - 1)
+    const edge3 = '#\n'
+    const currentLine = repBlanks + edge1 + leftRepSymbol + edge2
+    upperPlane += currentLine + upperRightRepSymbol + edge3
+    lowerPlane += currentLine.trim() + lowerRightRepSymbol + edge3
   }
-  //after the loop, we have the whole message decrypted into the array result, that is what we are returning.
-  return result;
+
+  gift += upperBorder + '\n'
+  gift += upperPlane
+  gift += middleBorder + '\n'
+  gift += lowerPlane
+  gift += lowerBorder + '\n'
+
+  return gift
 }
-
 // Ejemplos de uso
-const a = decode('hola (odnum)');
-console.log(a); // hola mundo
+console.log("Dibujo 1:\n", drawGift(4, '+'));
+/*
+   ####
+  #++##
+ #++#+#
+####++#
+#++#+#
+#++##
+####
+*/
 
-const b = decode('(olleh) (dlrow)!');
-console.log(b); // hello world!
+console.log("Dibujo 2:\n",drawGift(5, '*'));
+/*
+    #####
+   #***##
+  #***#*#
+ #***#**#
+#####***#
+#***#**#
+#***#*#
+#***##
+#####
+*/
 
-const c = decode('sa(u(cla)atn)s');
-console.log(c); // santaclaus
+console.log("Dibujo 3:\n",drawGift(1, '^'));
+/*
+#
+*/
