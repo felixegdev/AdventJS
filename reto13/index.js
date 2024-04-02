@@ -1,38 +1,46 @@
-function decode(message) {
+function calculateTime(deliveries) {
+  //we define a object signo that will have two properties, if its true means that we need to add the - sign because the time was exceeded if its false, nothin.
+  const signo = {true:'-', false:''}
+  //we get the time in seconds, so we can work better with times.
+  let time = 7*3600
 
-  //we create an array that will store the result as we are creating it.
-  const stack = [];
-
-  //we create an array that will be the expected result.
-  let result = '';
-
-  //we iterate the message to go char by char.
-  for (const char of message) {
-    //if the char is a '(' that means that all the chars that we have stored in resultwe need to move them into the stack array.
-    if (char === '(') {
-      //we push all we have stored in stack result into stack.
-      stack.push(result);
-      //here we need to restart the result array to start storing the new part of the encrypted message.
-      result = '';
-    } else if (char === ')') {
-      //with the char ')' that means that the encrypted part has ended, and all the chars we have in the 
-      //result array needs to be reversed. 
-      result = stack.pop() + result.split('').reverse().join('');
-    } else {
-      //if we have no parenthesis, we store the chars into the result waiting either way to finish the message, or for the next parenthesis.
-      result += char;
-    }
+  //we get the full time in seconds used in the delivery and substract the time of 7 hours minus the time used in the delivery.
+  for(const delivery of deliveries){
+    const [hours,minutes,seconds] = delivery.split(':')
+    time += - hours*3600 - minutes*60 - seconds
   }
-  //after the loop, we have the whole message decrypted into the array result, that is what we are returning.
-  return result;
+
+  //to determine if the time is negative or not
+  const bool = time > 0
+
+  //we get the time in absolute.
+  time = Math.abs(time)
+  
+  //we construct again the time in hours minutes and seconds.
+  const seconds = time%60
+  const minutes = Math.trunc(time/60)%60
+  const hours = (Math.trunc(time/60)-minutes)/60
+
+  //We format the string to be HH:mm:ss and with padStart to have at least 2 characters.
+  const formated_time = `${hours}`.padStart(2,'0') + ':' 
+                        +`${minutes}`.padStart(2,'0')+ ':'
+                        +`${seconds}`.padStart(2,'0') 
+
+  return  signo[bool] + formated_time
 }
 
-// Ejemplos de uso
-const a = decode('hola (odnum)');
-console.log(a); // hola mundo
+calculateTime(['00:10:00', '01:00:00', '03:30:00'])
+// '-02:20:00'
+console.log(calculateTime(['00:10:00', '01:00:00', '03:30:00']))
 
-const b = decode('(olleh) (dlrow)!');
-console.log(b); // hello world!
+calculateTime(['02:00:00', '05:00:00', '00:30:00'])
+// '00:30:00'
+console.log(calculateTime(['02:00:00', '05:00:00', '00:30:00']))
 
-const c = decode('sa(u(cla)atn)s');
-console.log(c); // santaclaus
+calculateTime([
+  '00:45:00',
+  '00:45:00',
+  '00:00:30',
+  '00:00:30'
+]) // '-05:29:00'
+console.log(calculateTime(['00:45:00','00:45:00','00:00:30','00:00:30']))
