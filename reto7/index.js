@@ -1,11 +1,6 @@
 function drawGift(size, symbol) {
-  // 1. Borde superior
-  // 2. Plano superior
-  // 3. Borde intermedio
-  // 4. Plano inferior
-  // 5. Borde inferior
-  // (Aplicar corrección para size = 1)
 
+  //if the size of the gift is 1, is only going to be a #.
   if (size === 1) return '#\n'
 
   let gift = ''

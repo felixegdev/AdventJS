@@ -1,38 +1,32 @@
-function decode(message) {
+function createChristmasTree (ornaments, height) {
+  let value = 0
 
-  //we create an array that will store the result as we are creating it.
-  const stack = [];
-
-  //we create an array that will be the expected result.
-  let result = '';
-
-  //we iterate the message to go char by char.
-  for (const char of message) {
-    //if the char is a '(' that means that all the chars that we have stored in resultwe need to move them into the stack array.
-    if (char === '(') {
-      //we push all we have stored in stack result into stack.
-      stack.push(result);
-      //here we need to restart the result array to start storing the new part of the encrypted message.
-      result = '';
-    } else if (char === ')') {
-      //with the char ')' that means that the encrypted part has ended, and all the chars we have in the 
-      //result array needs to be reversed. 
-      result = stack.pop() + result.split('').reverse().join('');
-    } else {
-      //if we have no parenthesis, we store the chars into the result waiting either way to finish the message, or for the next parenthesis.
-      result += char;
+  const tree = []
+ 
+  //With this for we will set the height of the tree.
+  for (let i = 1; i <= height; i++) {
+    let line = ''
+    //In this for we set the lines of the trees.
+    for (let j = 0; j < i; j++) {
+      //if the value equals the length of the line, we set the value again to 0 to start a new line.
+      if (value === ornaments.length) value = 0
+      //Here we set the line of the tree, adding the next value of the "ornament"
+      line = line + ornaments[value]
+      value++
     }
+
+    tree.push(
+      ' '.repeat(height - line.length),
+      line.split('').join(' '),
+      '\n'
+    )
   }
-  //after the loop, we have the whole message decrypted into the array result, that is what we are returning.
-  return result;
+
+  //here we add the log of the tree with the function padStart, that adds blank spaces as the height of the tree, so it can be in the middle.
+  tree.push('|'.padStart(height))
+  return tree.join('') + '\n'
 }
 
-// Ejemplos de uso
-const a = decode('hola (odnum)');
-console.log(a); // hola mundo
-
-const b = decode('(olleh) (dlrow)!');
-console.log(b); // hello world!
-
-const c = decode('sa(u(cla)atn)s');
-console.log(c); // santaclaus
+// Ejemplo de uso
+const christmasTree = createChristmasTree('123', 4);
+console.log(christmasTree);
