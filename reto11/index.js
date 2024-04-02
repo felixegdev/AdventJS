@@ -1,38 +1,43 @@
-function decode(message) {
+function getIndexsForPalindrome(word) {
 
-  //we create an array that will store the result as we are creating it.
-  const stack = [];
+  //we check if each letters equivalent in the other position is the same. 
+  const index = word.split('').findIndex((letter,i)=>letter != word.at(-i-1))
+  const index2 = word.length-1-index
+  //if index = -1 then is a palindrome. 
+  if(index == -1) return []
+  //if not, we iterate from the letter at position index to its equivalent position. 
+  for(let i = index+1; i<index2; i++){
+    //we copy the word array so we can manipulate.
+    const arr = word.split('')
+    //we modify the new array to try to do the palindrome. And then we check in diferent modifications if we have done a palindrome.
+    arr[index] = word.at(i)
+    arr[i] = word.at(index)
+    if(arr.every((l,i)=>l == arr.at(arr.length-1-i))) return [index,i]
 
-  //we create an array that will be the expected result.
-  let result = '';
+    arr[index] = word.at(index)
+    arr[i] = word.at(index2)
+    arr[index2] = word.at(i)
+    if(arr.every((l,i)=>l == arr.at(arr.length-1-i))) return [index+i,index2]
 
-  //we iterate the message to go char by char.
-  for (const char of message) {
-    //if the char is a '(' that means that all the chars that we have stored in resultwe need to move them into the stack array.
-    if (char === '(') {
-      //we push all we have stored in stack result into stack.
-      stack.push(result);
-      //here we need to restart the result array to start storing the new part of the encrypted message.
-      result = '';
-    } else if (char === ')') {
-      //with the char ')' that means that the encrypted part has ended, and all the chars we have in the 
-      //result array needs to be reversed. 
-      result = stack.pop() + result.split('').reverse().join('');
-    } else {
-      //if we have no parenthesis, we store the chars into the result waiting either way to finish the message, or for the next parenthesis.
-      result += char;
-    }
   }
-  //after the loop, we have the whole message decrypted into the array result, that is what we are returning.
-  return result;
+  //If we havent found any palindrome then we return null. 
+  return null
 }
 
-// Ejemplos de uso
-const a = decode('hola (odnum)');
-console.log(a); // hola mundo
+getIndexsForPalindrome('anna') // []
+console.log(getIndexsForPalindrome('anna'))
 
-const b = decode('(olleh) (dlrow)!');
-console.log(b); // hello world!
+getIndexsForPalindrome('abab') // [0, 1]
+console.log(getIndexsForPalindrome('abab'))
 
-const c = decode('sa(u(cla)atn)s');
-console.log(c); // santaclaus
+getIndexsForPalindrome('abac') // null
+console.log(getIndexsForPalindrome('abac'))
+
+getIndexsForPalindrome('aaaaaaaa') // []
+console.log(getIndexsForPalindrome('aaaaaaaa'))
+
+getIndexsForPalindrome('aaababa') // [1, 3]
+console.log(getIndexsForPalindrome('aaababa'))
+
+getIndexsForPalindrome('caababa') // null
+console.log(getIndexsForPalindrome('caababa'))
