@@ -1,38 +1,35 @@
-function decode(message) {
+function findBalancedSegment(message) {
+  let start = 0; // Inicializa el índice de inicio del segmento equilibrado
+  let maxLength = 0; // Inicializa la longitud máxima del segmento equilibrado
+  let zeros = 0; // Inicializa el contador de ceros
+  let ones = 0; // Inicializa el contador de unos
 
-  //we create an array that will store the result as we are creating it.
-  const stack = [];
-
-  //we create an array that will be the expected result.
-  let result = '';
-
-  //we iterate the message to go char by char.
-  for (const char of message) {
-    //if the char is a '(' that means that all the chars that we have stored in resultwe need to move them into the stack array.
-    if (char === '(') {
-      //we push all we have stored in stack result into stack.
-      stack.push(result);
-      //here we need to restart the result array to start storing the new part of the encrypted message.
-      result = '';
-    } else if (char === ')') {
-      //with the char ')' that means that the encrypted part has ended, and all the chars we have in the 
-      //result array needs to be reversed. 
-      result = stack.pop() + result.split('').reverse().join('');
+  // Itera sobre el mensaje para encontrar el segmento equilibrado más largo
+  for (let i = 0; i < message.length; i++) {
+    // Actualiza los contadores de ceros y unos según el valor del bit en la posición actual
+    if (message[i] === 0) {
+      zeros++;
     } else {
-      //if we have no parenthesis, we store the chars into the result waiting either way to finish the message, or for the next parenthesis.
-      result += char;
+      ones++;
+    }
+
+    // Si el número de ceros y unos es igual hasta la posición actual, actualiza el segmento equilibrado
+    if (zeros === ones) {
+      const length = i - start + 1; // Calcula la longitud del segmento equilibrado actual
+      if (length > maxLength) {
+        // Si la longitud actual es mayor que la longitud máxima registrada hasta ahora, actualiza la longitud máxima y la posición de inicio
+        maxLength = length;
+        start = i - length + 1;
+      }
     }
   }
-  //after the loop, we have the whole message decrypted into the array result, that is what we are returning.
-  return result;
+
+  // Retorna el índice de inicio y fin del segmento equilibrado más largo
+  return maxLength > 0 ? [start, start + maxLength - 1] : [];
 }
 
+
 // Ejemplos de uso
-const a = decode('hola (odnum)');
-console.log(a); // hola mundo
-
-const b = decode('(olleh) (dlrow)!');
-console.log(b); // hello world!
-
-const c = decode('sa(u(cla)atn)s');
-console.log(c); // santaclaus
+console.log(findBalancedSegment([1, 1, 0, 1, 1, 0, 1, 1])); // Output: [2, 5]
+console.log(findBalancedSegment([1, 1, 0])); // Output: [1, 2]
+console.log(findBalancedSegment([1, 1, 1])); // Output: []

@@ -1,38 +1,33 @@
-function decode(message) {
+function getStaircasePaths(steps, maxJump) {
+  const paths = [];
+  
+  // Función recursiva para generar todas las posibles secuencias de saltos
+  function generatePaths(currentPath, remainingSteps) {
+    // Si no quedan peldaños, añadimos la secuencia actual a la lista de caminos
+    if (remainingSteps === 0) {
+      paths.push(currentPath.slice());
+      return;
+    }
 
-  //we create an array that will store the result as we are creating it.
-  const stack = [];
-
-  //we create an array that will be the expected result.
-  let result = '';
-
-  //we iterate the message to go char by char.
-  for (const char of message) {
-    //if the char is a '(' that means that all the chars that we have stored in resultwe need to move them into the stack array.
-    if (char === '(') {
-      //we push all we have stored in stack result into stack.
-      stack.push(result);
-      //here we need to restart the result array to start storing the new part of the encrypted message.
-      result = '';
-    } else if (char === ')') {
-      //with the char ')' that means that the encrypted part has ended, and all the chars we have in the 
-      //result array needs to be reversed. 
-      result = stack.pop() + result.split('').reverse().join('');
-    } else {
-      //if we have no parenthesis, we store the chars into the result waiting either way to finish the message, or for the next parenthesis.
-      result += char;
+    // Iteramos sobre los posibles saltos, desde 1 hasta el máximo que puede dar un elfo
+    for (let jump = 1; jump <= maxJump && jump <= remainingSteps; jump++) {
+      // Añadimos el salto actual a la secuencia
+      currentPath.push(jump);
+      // Llamamos recursivamente a la función con los peldaños restantes
+      generatePaths(currentPath, remainingSteps - jump);
+      // Retiramos el último salto para probar con el siguiente
+      currentPath.pop();
     }
   }
-  //after the loop, we have the whole message decrypted into the array result, that is what we are returning.
-  return result;
+  
+  // Llamamos a la función recursiva para generar las secuencias de saltos
+  generatePaths([], steps);
+  
+  return paths;
 }
 
 // Ejemplos de uso
-const a = decode('hola (odnum)');
-console.log(a); // hola mundo
-
-const b = decode('(olleh) (dlrow)!');
-console.log(b); // hello world!
-
-const c = decode('sa(u(cla)atn)s');
-console.log(c); // santaclaus
+console.log(getStaircasePaths(2, 1)); // [[1, 1]]
+console.log(getStaircasePaths(3, 3)); // [[1, 1, 1], [1, 2], [2, 1], [3]]
+console.log(getStaircasePaths(5, 1)); // [[1, 1, 1, 1, 1]]
+console.log(getStaircasePaths(5, 2)); // [[1, 1, 1, 1, 1], [1, 1, 1, 2], [1, 1, 2, 1], [1, 2, 1, 1], [1, 2, 2], [2, 1, 1, 1], [2, 1, 2], [2, 2, 1]]

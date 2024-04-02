@@ -1,38 +1,89 @@
-function decode(message) {
+function revealSabotage(store) {
+  const rows = store.length;
+  const cols = store[0].length;
+  const result = [];
 
-  //we create an array that will store the result as we are creating it.
-  const stack = [];
-
-  //we create an array that will be the expected result.
-  let result = '';
-
-  //we iterate the message to go char by char.
-  for (const char of message) {
-    //if the char is a '(' that means that all the chars that we have stored in resultwe need to move them into the stack array.
-    if (char === '(') {
-      //we push all we have stored in stack result into stack.
-      stack.push(result);
-      //here we need to restart the result array to start storing the new part of the encrypted message.
-      result = '';
-    } else if (char === ')') {
-      //with the char ')' that means that the encrypted part has ended, and all the chars we have in the 
-      //result array needs to be reversed. 
-      result = stack.pop() + result.split('').reverse().join('');
-    } else {
-      //if we have no parenthesis, we store the chars into the result waiting either way to finish the message, or for the next parenthesis.
-      result += char;
+  // Iterar sobre cada fila de la matriz
+  for (let i = 0; i < rows; i++) {
+    const row = [];
+    // Iterar sobre cada columna de la fila actual
+    for (let j = 0; j < cols; j++) {
+      // Si la celda actual contiene un juguete saboteado (*), agregarlo directamente al resultado
+      if (store[i][j] === '*') {
+        row.push('*');
+      } else {
+        let count = 0;
+        // Contar el número de juguetes saboteados en las celdas adyacentes
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dy = -1; dy <= 1; dy++) {
+            const ni = i + dx;
+            const nj = j + dy;
+            // Verificar si la celda adyacente está dentro de los límites de la matriz y contiene un juguete saboteado
+            if (ni >= 0 && ni < rows && nj >= 0 && nj < cols && store[ni][nj] === '*') {
+              count++;
+            }
+          }
+        }
+        // Si no hay juguetes saboteados en las celdas adyacentes, agregar un espacio en blanco en lugar de '0'
+        row.push(count === 0 ? ' ' : count.toString());
+      }
     }
+    // Agregar la fila actual al resultado
+    result.push(row);
   }
-  //after the loop, we have the whole message decrypted into the array result, that is what we are returning.
+
   return result;
 }
 
-// Ejemplos de uso
-const a = decode('hola (odnum)');
-console.log(a); // hola mundo
 
-const b = decode('(olleh) (dlrow)!');
-console.log(b); // hello world!
 
-const c = decode('sa(u(cla)atn)s');
-console.log(c); // santaclaus
+const store1 = [
+  ['*', ' ', ' ', ' '],
+  [' ', ' ', '*', ' '],
+  [' ', ' ', ' ', ' '],
+  ['*', ' ', ' ', ' ']
+];
+
+console.log(revealSabotage(store1));
+/* Debería mostrar:
+[
+  ['*', '2', '1', '1'],
+  ['1', '2', '*', '1'],
+  ['1', '2', '1', '1'],
+  ['*', '1', ' ', ' ']
+]
+*/
+
+const store2 = [
+  ['*', '*', '*', ' '],
+  [' ', ' ', ' ', ' '],
+  [' ', '*', ' ', ' '],
+  [' ', '*', '*', '*']
+];
+
+console.log(revealSabotage(store2));
+/* Debería mostrar:
+[
+  ['*', '*', '*', '2'],
+  ['2', '4', '2', '2'],
+  ['2', '*', '3', '3'],
+  ['1', '*', '*', '*']
+]
+*/
+
+const store3 = [
+  [' ', ' ', '*', ' ', '*', ' '],
+  [' ', ' ', '*', '*', '*', ' '],
+  ['*', ' ', ' ', '*', '*', '*'],
+  ['*', '*', ' ', '*', '*', '*']
+];
+
+console.log(revealSabotage(store3));
+/* Debería mostrar:
+[
+  ['1', '2', '*', '5', '*', '2'],
+  ['3', '5', '*', '*', '*', '4'],
+  ['*', '6', '5', '*', '*', '*'],
+  ['*', '*', '6', '*', '*', '*']
+]
+*/

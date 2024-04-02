@@ -1,38 +1,44 @@
-function decode(message) {
+function organizeChristmasDinner(dishes) {
+  // Creamos un objeto para almacenar los platos por ingredientes
+  const ingredientes = {};
 
-  //we create an array that will store the result as we are creating it.
-  const stack = [];
-
-  //we create an array that will be the expected result.
-  let result = '';
-
-  //we iterate the message to go char by char.
-  for (const char of message) {
-    //if the char is a '(' that means that all the chars that we have stored in resultwe need to move them into the stack array.
-    if (char === '(') {
-      //we push all we have stored in stack result into stack.
-      stack.push(result);
-      //here we need to restart the result array to start storing the new part of the encrypted message.
-      result = '';
-    } else if (char === ')') {
-      //with the char ')' that means that the encrypted part has ended, and all the chars we have in the 
-      //result array needs to be reversed. 
-      result = stack.pop() + result.split('').reverse().join('');
-    } else {
-      //if we have no parenthesis, we store the chars into the result waiting either way to finish the message, or for the next parenthesis.
-      result += char;
+  // Iteramos sobre cada plato en la lista de platos
+  for (const dish of dishes) {
+    // Extraemos el nombre del plato
+    const nombrePlato = dish[0];
+    
+    // Iteramos sobre los ingredientes a partir del segundo elemento del plato
+    for (let i = 1; i < dish.length; i++) {
+      const ingrediente = dish[i]; // Extraemos el nombre del ingrediente
+      
+      // Si el ingrediente aún no está en el objeto de ingredientes, lo inicializamos como un array vacío
+      if (!ingredientes[ingrediente]) {
+        ingredientes[ingrediente] = [];
+      }
+      
+      // Agregamos el plato al array de platos asociado al ingrediente
+      ingredientes[ingrediente].push(nombrePlato);
     }
   }
-  //after the loop, we have the whole message decrypted into the array result, that is what we are returning.
-  return result;
+  
+  // Filtramos los ingredientes que tienen al menos 2 platos asociados
+  const ingredientesRepetidos = Object.entries(ingredientes).filter(([ingrediente, platos]) => platos.length >= 2);
+  
+  // Ordenamos alfabéticamente los ingredientes repetidos
+  ingredientesRepetidos.sort(([ingredienteA], [ingredienteB]) => ingredienteA.localeCompare(ingredienteB));
+  
+  // Creamos el resultado final
+  const resultado = ingredientesRepetidos.map(([ingrediente, platos]) => [ingrediente, ...platos.sort()]);
+  
+  return resultado;
 }
 
-// Ejemplos de uso
-const a = decode('hola (odnum)');
-console.log(a); // hola mundo
+// Ejemplo de uso
+const dishes = [
+  ["christmas turkey", "turkey", "sauce", "herbs"],
+  ["cake", "flour", "sugar", "egg"],
+  ["hot chocolate", "chocolate", "milk", "sugar"],
+  ["pizza", "sauce", "tomato", "cheese", "ham"],
+];
 
-const b = decode('(olleh) (dlrow)!');
-console.log(b); // hello world!
-
-const c = decode('sa(u(cla)atn)s');
-console.log(c); // santaclaus
+console.log(organizeChristmasDinner(dishes));

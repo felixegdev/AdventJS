@@ -1,38 +1,40 @@
-function decode(message) {
-
-  //we create an array that will store the result as we are creating it.
-  const stack = [];
-
-  //we create an array that will be the expected result.
-  let result = '';
-
-  //we iterate the message to go char by char.
-  for (const char of message) {
-    //if the char is a '(' that means that all the chars that we have stored in resultwe need to move them into the stack array.
-    if (char === '(') {
-      //we push all we have stored in stack result into stack.
-      stack.push(result);
-      //here we need to restart the result array to start storing the new part of the encrypted message.
-      result = '';
-    } else if (char === ')') {
-      //with the char ')' that means that the encrypted part has ended, and all the chars we have in the 
-      //result array needs to be reversed. 
-      result = stack.pop() + result.split('').reverse().join('');
-    } else {
-      //if we have no parenthesis, we store the chars into the result waiting either way to finish the message, or for the next parenthesis.
-      result += char;
-    }
+function travelDistance(map) {
+  // Convertir el mapa en un array de filas
+  const rows = map.trim().split('\n');
+  
+  // Encontrar la posición de Santa Claus (S) y las posiciones de los niños (1 al 9)
+  let santaPosition, childrenPositions = [];
+  for (let y = 0; y < rows.length; y++) {
+      for (let x = 0; x < rows[y].length; x++) {
+          const cell = rows[y][x];
+          if (cell === 'S') {
+              santaPosition = { x, y };
+          } else if (/[1-9]/.test(cell)) {
+              const childNumber = parseInt(cell);
+              childrenPositions[childNumber] = { x, y };
+          }
+      }
   }
-  //after the loop, we have the whole message decrypted into the array result, that is what we are returning.
-  return result;
+  
+  // Calcular la distancia total
+  let totalDistance = 0;
+  for (let i = 1; i < childrenPositions.length; i++) {
+      const childPosition = childrenPositions[i];
+      const distance = Math.abs(santaPosition.x - childPosition.x) + Math.abs(santaPosition.y - childPosition.y);
+      totalDistance += distance;
+      santaPosition = childPosition; // Actualizar la posición de Santa Claus
+  }
+  
+  return totalDistance;
 }
 
-// Ejemplos de uso
-const a = decode('hola (odnum)');
-console.log(a); // hola mundo
+// Ejemplos de uso:
+const map = `.....1....
+..S.......
+..........
+....3.....
+......2...`;
+console.log(travelDistance(map)); // Salida esperada: 12
 
-const b = decode('(olleh) (dlrow)!');
-console.log(b); // hello world!
-
-const c = decode('sa(u(cla)atn)s');
-console.log(c); // santaclaus
+const map2 = `..S.1...`;
+console.log(travelDistance(map2)); // Salida esperada: 2
