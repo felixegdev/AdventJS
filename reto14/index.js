@@ -1,38 +1,37 @@
-function decode(message) {
+function maxGifts(houses) {
+  // if there are no gifts, then we return 0. 
+  if (houses.length === 0) return 0;
 
-  //we create an array that will store the result as we are creating it.
-  const stack = [];
+  // We initialize an array to store the max gifts given
+  const maxGiftsDP = new Array(houses.length).fill(0);
 
-  //we create an array that will be the expected result.
-  let result = '';
+  // For the first house, santa can give the amount on that house
+  maxGiftsDP[0] = houses[0];
 
-  //we iterate the message to go char by char.
-  for (const char of message) {
-    //if the char is a '(' that means that all the chars that we have stored in resultwe need to move them into the stack array.
-    if (char === '(') {
-      //we push all we have stored in stack result into stack.
-      stack.push(result);
-      //here we need to restart the result array to start storing the new part of the encrypted message.
-      result = '';
-    } else if (char === ')') {
-      //with the char ')' that means that the encrypted part has ended, and all the chars we have in the 
-      //result array needs to be reversed. 
-      result = stack.pop() + result.split('').reverse().join('');
-    } else {
-      //if we have no parenthesis, we store the chars into the result waiting either way to finish the message, or for the next parenthesis.
-      result += char;
-    }
+  // On the second house, santa can give the maximum in both houses.
+  maxGiftsDP[1] = Math.max(houses[0], houses[1]);
+
+  // Now we calculate the maximum´s gift santa can give
+  for (let i = 2; i < houses.length; i++) {
+      // the maximum gifts santa can give in the actual house goes between:
+      // 1. the amount of gifts he can give in the actual house plus the maximum amount he can give 2 house before.
+      // 2. the maximum amount he can give the house before.
+      maxGiftsDP[i] = Math.max(houses[i] + maxGiftsDP[i - 2], maxGiftsDP[i - 1]);
   }
-  //after the loop, we have the whole message decrypted into the array result, that is what we are returning.
-  return result;
+
+  // The maximum amount of gifts santa can give is the last value on the array.
+  return maxGiftsDP[houses.length - 1];
 }
 
-// Ejemplos de uso
-const a = decode('hola (odnum)');
-console.log(a); // hola mundo
 
-const b = decode('(olleh) (dlrow)!');
-console.log(b); // hello world!
+maxGifts([2, 4, 2]) // 4 (4)
+console.log(maxGifts([2, 4, 2]))
 
-const c = decode('sa(u(cla)atn)s');
-console.log(c); // santaclaus
+maxGifts([5, 1, 1, 5]) // 10 (5 + 5)
+console.log(maxGifts([5, 1, 1, 5]))
+
+maxGifts([4, 1, 1, 4, 2, 1]) // 9 (4 + 4 + 1)
+console.log(maxGifts([4, 1, 1, 4, 2, 1]))
+
+maxGifts([1, 3, 1, 3, 100]) // 103 (3 + 100)
+console.log(maxGifts([1, 3, 1, 3, 100]))
