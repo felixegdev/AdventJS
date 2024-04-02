@@ -1,38 +1,46 @@
-function decode(message) {
-
-  //we create an array that will store the result as we are creating it.
-  const stack = [];
-
-  //we create an array that will be the expected result.
-  let result = '';
-
-  //we iterate the message to go char by char.
-  for (const char of message) {
-    //if the char is a '(' that means that all the chars that we have stored in resultwe need to move them into the stack array.
-    if (char === '(') {
-      //we push all we have stored in stack result into stack.
-      stack.push(result);
-      //here we need to restart the result array to start storing the new part of the encrypted message.
-      result = '';
-    } else if (char === ')') {
-      //with the char ')' that means that the encrypted part has ended, and all the chars we have in the 
-      //result array needs to be reversed. 
-      result = stack.pop() + result.split('').reverse().join('');
-    } else {
-      //if we have no parenthesis, we store the chars into the result waiting either way to finish the message, or for the next parenthesis.
-      result += char;
-    }
+function optimizeIntervals(intervals) {
+  if (intervals.length === 0) {
+      return [];
   }
-  //after the loop, we have the whole message decrypted into the array result, that is what we are returning.
+
+  // Paso 1: Ordenar los intervalos según su hora de inicio
+  intervals.sort((a, b) => a[0] - b[0]);
+
+  const result = [intervals[0]];
+
+  // Paso 2: Fusionar los intervalos superpuestos
+  for (let i = 1; i < intervals.length; i++) {
+      const currentInterval = intervals[i];
+      const lastMergedInterval = result[result.length - 1];
+
+      // Si el intervalo actual comienza después del final del último intervalo fusionado,
+      // simplemente lo agregamos a la lista de intervalos fusionados
+      if (currentInterval[0] > lastMergedInterval[1]) {
+          result.push(currentInterval);
+      } else {
+          // Si hay superposición, fusionamos los intervalos actualizando el final del último intervalo fusionado
+          lastMergedInterval[1] = Math.max(lastMergedInterval[1], currentInterval[1]);
+      }
+  }
+
   return result;
 }
 
 // Ejemplos de uso
-const a = decode('hola (odnum)');
-console.log(a); // hola mundo
+console.log(optimizeIntervals([
+  [5, 8],
+  [2, 7],
+  [3, 4]
+])); // [[2, 8]]
 
-const b = decode('(olleh) (dlrow)!');
-console.log(b); // hello world!
+console.log(optimizeIntervals([
+  [1, 3],
+  [8, 10],
+  [2, 6]
+])); // [[1, 6], [8, 10]]
 
-const c = decode('sa(u(cla)atn)s');
-console.log(c); // santaclaus
+console.log(optimizeIntervals([
+  [3, 4],
+  [1, 2],
+  [5, 6]
+])); // [[1, 2], [3, 4], [5, 6]]
