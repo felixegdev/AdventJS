@@ -1,38 +1,56 @@
-function decode(message) {
+function compile(code) {
+  // Definimos un objeto que asigna valores numéricos a cada operador del lenguaje Elfiano
+  const operador = {
+    '+': 1,  // Incrementa en 1 el contador
+    '-': -1, // Decrementa en 1 el contador
+    '?': 0,  // Inicia un bloque condicional
+    '¿': 0,  // Inicia un bloque condicional
+    '%': 0,  // Marca un punto de retorno
+    '<': 0,  // Vuelve atrás a la última instrucción con el símbolo % que se haya visto
+  };
 
-  //we create an array that will store the result as we are creating it.
-  const stack = [];
+  // Inicializamos variables para almacenar el resultado, el punto de retorno y la condición de bloque condicional
+  let result = 0,
+      retorno = null,
+      cond = 0;
 
-  //we create an array that will be the expected result.
-  let result = '';
+  // Iteramos sobre cada carácter del código de instrucciones
+  for (let i = 0; i < code.length; i++) {
+    // Verificamos si el carácter actual indica la presencia de un bloque condicional
+    // y si la condición para ejecutarlo es verdadera
+    cond = ((code[i] == '¿') + (result <= 0)) > 1;
 
-  //we iterate the message to go char by char.
-  for (const char of message) {
-    //if the char is a '(' that means that all the chars that we have stored in resultwe need to move them into the stack array.
-    if (char === '(') {
-      //we push all we have stored in stack result into stack.
-      stack.push(result);
-      //here we need to restart the result array to start storing the new part of the encrypted message.
-      result = '';
-    } else if (char === ')') {
-      //with the char ')' that means that the encrypted part has ended, and all the chars we have in the 
-      //result array needs to be reversed. 
-      result = stack.pop() + result.split('').reverse().join('');
-    } else {
-      //if we have no parenthesis, we store the chars into the result waiting either way to finish the message, or for the next parenthesis.
-      result += char;
+    // Si se cumple la condición del bloque condicional, saltamos al carácter después del bloque condicional
+    i = i + (code.indexOf('?') * cond) - (i * cond);
+
+    // Manejamos la instrucción de punto de retorno (%)
+    if (code[i] == '%') {
+      retorno = i + 1; // Actualizamos el punto de retorno
     }
+
+    // Manejamos la instrucción de retroceso (<)
+    if (code[i] == '<') {
+      retorno ||= i; // Si retorno es null, asignamos i como valor de retorno
+      i = retorno;   // Actualizamos el índice para apuntar al siguiente carácter al de retorno
+      retorno = null; // Reseteamos el punto de retorno
+    }
+
+    // Actualizamos el valor del operador multiplicativo (*) para reflejar el valor actual de result
+    operador['*'] = result;
+
+    // Actualizamos el valor de result sumando el valor correspondiente del operador actual
+    result += operador[code.at(i)];
   }
-  //after the loop, we have the whole message decrypted into the array result, that is what we are returning.
+
+  // Devolvemos el valor final de result
   return result;
 }
 
+
 // Ejemplos de uso
-const a = decode('hola (odnum)');
-console.log(a); // hola mundo
-
-const b = decode('(olleh) (dlrow)!');
-console.log(b); // hello world!
-
-const c = decode('sa(u(cla)atn)s');
-console.log(c); // santaclaus
+console.log(compile('++*-')); // 3
+console.log(compile('++%++<')); // 6
+console.log(compile('++<--')); // 0
+console.log(compile('++¿+?')); // 3
+console.log(compile('--¿+++?')); // -2
+console.log(compile('%¿+++?+<+¿++--+?')); // 7
